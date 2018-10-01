@@ -1,8 +1,8 @@
 add_executable(asantest asantest.c)
 target_link_libraries(asantest
     PRIVATE
-        OpenGL::OpenGL
-        GLEW::GLEW
+        # OpenGL::OpenGL
+        # GLEW::GLEW
         ${SDL2_LIBRARIES}
 )
 target_include_directories(asantest
