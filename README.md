@@ -5,10 +5,12 @@ as well as basic input controls through SDL2
 
 ### Help with ASAN
 
-Address Sanitizer is amazing, but I guess it may just not work with GLEW
+Address Sanitizer is amazing, but I guess it may just not work with GLEW or SDL2
 
 Example program run:
 
+    $ source dev/env.sh
+    $ cd build
     $ cmake .. -DCMAKE_BUILD_TYPE=Debug
     $ cmake --build .
     $ ./src/main
