@@ -99,7 +99,6 @@ int main(int argc, char *argv[])
         Shader_use(ourShader);
         $glcheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
         $glcheck(glBindVertexArray(VAO));
-        /* $glcheck(glDrawArrays(GL_TRIANGLES, 0, 3)); */
         $glcheck(glDrawElements(GL_TRIANGLES, ARRAY_SIZE(indicies), GL_UNSIGNED_SHORT, NULL));
         $glcheck(glBindVertexArray(0));
 

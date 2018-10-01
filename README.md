@@ -9,7 +9,7 @@ Address Sanitizer is amazing, but I guess it may just not work with GLEW
 
 Example program run:
 
-    ./src/main
+    $ ./src/main
 
 
     ==30498==ERROR: LeakSanitizer: detected memory leaks

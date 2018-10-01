@@ -3,6 +3,15 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#if defined(NDEBUG)
+
+# define $glcheck(call) call
+# define $log(...)    (void)0
+# define $fatal(...)  (void)0
+# define $assert(...) (void)0
+
+#else
+
 #define $log(...) do {                                 \
     fprintf(stderr, "%s[%u]: \n", __FILE__, __LINE__); \
     fprintf(stderr, __VA_ARGS__);                      \
@@ -19,6 +28,7 @@
         $fatal("%s", MSG);                             \
 } while (0)
 
+
 #define $glcheck(call) do {                            \
     call;                                              \
     GLenum gl_err;                                     \
@@ -31,6 +41,7 @@
     if (gl_had_error)                                  \
         exit(EXIT_FAILURE);                            \
 } while (0)
+#endif
 
 #define ARRAY_SIZE(arr) \
             sizeof(arr) / sizeof((arr)[0])
