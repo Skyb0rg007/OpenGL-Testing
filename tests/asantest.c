@@ -1,6 +1,8 @@
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 
+/* Don't call SDL_Quit() when debugging */
+
 int main(int argc, char *argv[])
 {
     (void)argc, (void)argv;
@@ -17,6 +19,6 @@ int main(int argc, char *argv[])
 
     /* SDL_GL_DeleteContext(ctx); */
     /* SDL_DestroyWindow(w); */
-    SDL_Quit();
+    /* SDL_Quit(); */
     return 0;
 }

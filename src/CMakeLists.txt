@@ -16,9 +16,11 @@ target_compile_features(main
 )
 target_compile_options(main
     PRIVATE
-        -Wall -Wextra -pedantic
+        -Wall -Wextra -pedantic -Wno-dollar-in-identifier-extension
+        $<$<CONFIG:Debug>: -fno-omit-frame-pointer -fsanitize=address -g3>
 )
 target_compile_definitions(main 
     PRIVATE
         "RESOURCE_DIR=\"${RESOURCE_DIR}\""
+        $<$<CONFIG:Release>:"NDEBUG">
 )

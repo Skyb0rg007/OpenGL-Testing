@@ -10,23 +10,20 @@ if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "In-source builds are not allowed")
 endif()
 
+# Load all the needed packages
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL 3.3 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(GLEW 2.1 REQUIRED)
 
-# Enable Address Sanitizer for debug builds
-# (cmake 3.13 better have target_linker_flags)
-if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    message("Debug build type selected")
-    set(CMAKE_C_FLAGS_DEBUG 
-        "${CMAKE_C_FLAGS_DEBUG} -g -fno-omit-frame-pointer -fsanitize=address")
-    set(CMAKE_LINKER_FLAGS_DEBUG 
-        "${CMAKE_LINKER_FLAGS_DEBUG} -g -fno-omit-frame-pointer -fsanitize=address")
-endif()
+# Enable Address Sanitizer for building executables
+# (cmake 3.13 better have target_linker_options)
+string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG 
+    " -fno-omit-frame-pointer -fsanitize=address ")
 
 # Location for shaders
 set(RESOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/")
+
 add_subdirectory(src)
 
 # enable_testing()

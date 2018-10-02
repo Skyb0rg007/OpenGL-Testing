@@ -6,30 +6,33 @@
 #if defined(NDEBUG)
 
 # define $glcheck(call) call
-# define $log(...)    (void)0
-# define $fatal(...)  (void)0
-# define $assert(...) (void)0
+# define $log(...)     (void)0
+# define $fatal(...)   (void)0
+# define $assert(X, Y) (void)sizeof(X) /* Prevents unused warnings */
 
-#else
+#else /* NDEBUG */
 
-#define $log(...) do {                                 \
+/* Disable calling SDL_Quit() when debugging */
+# define SDL_Quit() (void)0
+
+# define $log(...) do {                                \
     fprintf(stderr, "%s[%u]: \n", __FILE__, __LINE__); \
     fprintf(stderr, __VA_ARGS__);                      \
     fprintf(stderr, "\n");                             \
 } while (0)
 
-#define $fatal(...) do {                               \
+# define $fatal(...) do {                              \
     $log(__VA_ARGS__);                                 \
     exit(EXIT_FAILURE);                                \
 } while (0)
 
-#define $assert(X, MSG) do {                           \
+# define $assert(X, MSG) do {                          \
     if (!(X))                                          \
         $fatal("%s", MSG);                             \
 } while (0)
 
 
-#define $glcheck(call) do {                            \
+# define $glcheck(call) do {                           \
     call;                                              \
     GLenum gl_err;                                     \
     bool gl_had_error = false;                         \
@@ -41,9 +44,10 @@
     if (gl_had_error)                                  \
         exit(EXIT_FAILURE);                            \
 } while (0)
-#endif
 
-#define ARRAY_SIZE(arr) \
+#endif /* NDEBUG */
+
+#define ARRAY_SIZE(arr)                                \
             sizeof(arr) / sizeof((arr)[0])
 
 static inline const char *glEnumName(GLenum e)

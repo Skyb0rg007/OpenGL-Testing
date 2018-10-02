@@ -25,23 +25,24 @@ int main(int argc, char *argv[])
     /* Set the OpenGL viewport to the entire window */
     $glcheck(glViewport(0, 0, WIDTH, HEIGHT));
 
-    // Init shaders
+    /* Init shaders */
     Shader *ourShader = Shader_new(VERTEXFILE, FRAGFILE);
 
-    GLfloat vertices[] = {
-        // position           //color
-        -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f, // bottom left
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f, // bottom right
-        -0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f, // top left
-         0.5f,  0.5f, 0.0f,   0.2f, 0.2f, 0.2f  // top right
+    const GLfloat vertices[24] = {
+        /*    position             color     */
+        -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f, /* bottom left  */
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f, /* bottom right */
+        -0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f, /* top left     */
+         0.5f,  0.5f, 0.0f,   0.2f, 0.2f, 0.2f  /* top right    */
     };
 
-    GLushort indicies[] = {
-        0, 1, 2,
-        2, 1, 3
+    const GLushort indicies[6] = {
+        0, 1, 2, /* First triangle  */
+        2, 1, 3  /* Second triangle */
     };
 
     GLuint VAO, VBO, EBO;
+
     /* Create Vertex Array */
     $glcheck(glGenVertexArrays(1, &VAO));
     $glcheck(glBindVertexArray(VAO));
@@ -49,14 +50,16 @@ int main(int argc, char *argv[])
     /* Create Vertex Buffer */
     $glcheck(glGenBuffers(1, &VBO));
     $glcheck(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-    $glcheck(glBufferData(GL_ARRAY_BUFFER, sizeof vertices, vertices, GL_STATIC_DRAW));
+    $glcheck(glBufferData(GL_ARRAY_BUFFER, 
+                sizeof vertices, vertices, GL_STATIC_DRAW));
 
-    /* Create Element Buffer */
+    /* Create Element/Index Buffer */
     $glcheck(glGenBuffers(1, &EBO));
     $glcheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
-    $glcheck(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof indicies, indicies, GL_STATIC_DRAW));
+    $glcheck(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
+                sizeof indicies, indicies, GL_STATIC_DRAW));
 
-    /* Set position to be variable in position 0 
+    /* Set position to be variable in location 0 
      * 0 - generic vector index to modify
      * 3 - number of components per generic vector attribute
      * GL_FLOAT - type of each component
@@ -68,18 +71,18 @@ int main(int argc, char *argv[])
                 6 * sizeof GL_FLOAT, (const GLvoid *)0));
     $glcheck(glEnableVertexAttribArray(0));
 
-    /* Set color to be variable in position 1 */
+    /* Set color to be variable in location 1 */
     $glcheck(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 
                 6 * sizeof GL_FLOAT, (const GLvoid *)(3 * sizeof (GLfloat))));
     $glcheck(glEnableVertexAttribArray(1));
 
-    /* Un-bind VAO and VBO */
-    $glcheck(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    /* Un-bind VAO, VBO, and EBO */
     $glcheck(glBindVertexArray(0));
+    $glcheck(glBindBuffer(GL_ARRAY_BUFFER, 0));
     $glcheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 
     int ret = SDL_GL_SetSwapInterval(1);
-    $assert(ret == 0, "Could not set GL swap interval");
+    $assert(ret == 0, SDL_GetError());
 
     /* Event Loop */
     SDL_Event e;
@@ -95,12 +98,20 @@ int main(int argc, char *argv[])
         $glcheck(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
         $glcheck(glClear(GL_COLOR_BUFFER_BIT));
 
-        // draw OpenGL
+        /* draw OpenGL */
+        /* Setup shader, VAO, EBO */
         Shader_use(ourShader);
         $glcheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO));
         $glcheck(glBindVertexArray(VAO));
-        $glcheck(glDrawElements(GL_TRIANGLES, ARRAY_SIZE(indicies), GL_UNSIGNED_SHORT, NULL));
+
+        /* Actually draw */
+        $glcheck(glDrawElements(GL_TRIANGLES, 
+                    ARRAY_SIZE(indicies), GL_UNSIGNED_SHORT, NULL));
+
+        /* Remove shader, VAO, EBO */
+        $glcheck(glUseProgram(0));
         $glcheck(glBindVertexArray(0));
+        $glcheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 
         SDL_GL_SwapWindow(window);
     }
