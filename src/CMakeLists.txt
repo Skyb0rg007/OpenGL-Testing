@@ -16,7 +16,9 @@ target_compile_features(main
 )
 target_compile_options(main
     PRIVATE
-        -Wall -Wextra -pedantic -Wno-dollar-in-identifier-extension
+        -Wall -Wextra -pedantic 
+        -Wno-dollar-in-identifier-extension
+        -Wimplicit-fallthrough
         $<$<CONFIG:Debug>: -fno-omit-frame-pointer -fsanitize=address -g3>
 )
 target_compile_definitions(main 

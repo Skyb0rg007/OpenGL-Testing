@@ -11,8 +11,10 @@ static const GLint WIDTH = 800, HEIGHT = 600;
 static const GLchar *const VERTEXFILE = RESOURCE_DIR "vertex.glsl";
 static const GLchar *const FRAGFILE   = RESOURCE_DIR "frag.glsl";
 
-static SDL_Window *init_sdl(SDL_GLContext *context);
-static void cleanup_sdl(SDL_Window *window, SDL_GLContext context);
+static SDL_Window *init_sdl(SDL_GLContext *context)
+    __attribute__((returns_nonnull, nonnull(1)));
+static void cleanup_sdl(SDL_Window *window, SDL_GLContext context)
+    __attribute__((nonnull(1, 2)));
 
 int main(int argc, char *argv[])
 {

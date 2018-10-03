@@ -1,7 +1,17 @@
+#ifndef UTILS_H_INCLUDED
+#define UTILS_H_INCLUDED
+
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+
+#define ARRAY_SIZE(arr)                                \
+            sizeof(arr) / sizeof((arr)[0])
+
+#if defined(NOATTRIBUTES)
+# define __attribute__()
+#endif
 
 #if defined(NDEBUG)
 
@@ -45,11 +55,7 @@
         exit(EXIT_FAILURE);                            \
 } while (0)
 
-#endif /* NDEBUG */
-
-#define ARRAY_SIZE(arr)                                \
-            sizeof(arr) / sizeof((arr)[0])
-
+__attribute__((returns_nonnull, const))
 static inline const char *glEnumName(GLenum e)
 {
     switch(e)
@@ -78,3 +84,7 @@ static inline const char *glEnumName(GLenum e)
             return "(unknown)";
     }
 }
+
+#endif /* NDEBUG */
+
+#endif /* UTILS_H_INCLUDED */

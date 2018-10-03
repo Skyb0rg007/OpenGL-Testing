@@ -6,8 +6,8 @@
 #include "shader.h"
 #include "utils.h"
 
-static GLchar *read_file(const char *path);
-static long file_size(FILE *);
+static GLchar *read_file(const char *path) __attribute__((nonnull(1)));
+static long file_size(FILE *) __attribute__((nonnull(1)));
 
 Shader *Shader_new_src(const GLchar *vertexSrc, const GLchar *fragmentSrc)
 {
