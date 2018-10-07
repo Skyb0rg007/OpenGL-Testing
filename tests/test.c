@@ -1,5 +1,5 @@
 #define SDL_ASSERT_LEVEL 3
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[])

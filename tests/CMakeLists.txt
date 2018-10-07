@@ -1,4 +1,4 @@
-add_executable(asantest asantest.c)
+add_executable(asantest EXCLUDE_FROM_ALL asantest.c)
 target_link_libraries(asantest
     PRIVATE
         # OpenGL::OpenGL

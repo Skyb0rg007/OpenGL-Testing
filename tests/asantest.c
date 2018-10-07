@@ -1,5 +1,5 @@
 #include <GL/glew.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 /* Don't call SDL_Quit() when debugging */
 
