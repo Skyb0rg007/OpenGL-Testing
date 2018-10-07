@@ -3,11 +3,7 @@ target_link_libraries(asantest
     PRIVATE
         # OpenGL::OpenGL
         # GLEW::GLEW
-        ${SDL2_LIBRARIES}
-)
-target_include_directories(asantest
-    PRIVATE
-        ${SDL2_INCLUDE_DIRS}
+        SDL2::SDL2
 )
 target_compile_options(asantest
     PRIVATE

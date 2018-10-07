@@ -3,11 +3,10 @@ target_link_libraries(main
     PRIVATE 
         OpenGL::OpenGL 
         GLEW::GLEW 
-        ${SDL2_LIBRARIES}
+        SDL2::SDL2main
 )
 target_include_directories(main 
     PRIVATE 
-        ${SDL2_INCLUDE_DIRS}
         ${CMAKE_SOURCE_DIR}/include
 )
 target_compile_features(main
