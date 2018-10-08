@@ -13,3 +13,18 @@ target_compile_features(asantest
     PRIVATE
         c_std_11
 )
+
+add_executable(logtest EXCLUDE_FROM_ALL test.c)
+target_link_libraries(logtest
+    PRIVATE
+        SDL2::SDL2
+        SQLite3::SQLite3
+)
+target_compile_options(logtest
+    PRIVATE
+        -Wall -Wextra -pedantic
+)
+target_compile_features(logtest
+    PRIVATE
+        c_std_11
+)

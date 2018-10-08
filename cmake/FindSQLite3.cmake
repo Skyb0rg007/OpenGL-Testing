@@ -1,0 +1,25 @@
+find_path(SQLITE3_INCLUDE_DIR
+    NAMES sqlite3.h
+)
+find_library(SQLITE3_LIBRARY
+    NAMES sqlite3
+)
+set(SQLITE3_INCLUDE_DIRS "${SQLITE3_INCLUDE_DIR}")
+set(SQLITE3_LIBRARIES "${SQLITE3_LIBRARY}")
+
+include(FindPackageHandleStandardArgs)
+
+find_package_handle_standard_args(SQLite3
+    FOUND_VAR
+        SQLITE3_FOUND
+    REQUIRED_VARS
+        SQLITE3_INCLUDE_DIR
+        SQLITE3_LIBRARIES
+)
+mark_as_advanced(SQLITE3_INCLUDE_DIR SQLITE3_LIBRARIES)
+
+add_library(SQLite3::SQLite3 UNKNOWN IMPORTED)
+set_target_properties(SQLite3::SQLite3 PROPERTIES
+    IMPORTED_LOCATION "${SQLITE3_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${SQLITE3_INCLUDE_DIRS}"
+)

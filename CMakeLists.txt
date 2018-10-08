@@ -18,6 +18,7 @@ find_package(OpenGL 3.3 REQUIRED)
 find_package(SDL2 2.0 REQUIRED) # This uses the custom FindSDL2.cmake script
 find_package(GLEW 2.1 REQUIRED)
 find_package(GSL 2.0 REQUIRED)
+find_package(SQLite3 REQUIRED)
 
 # Enable Address Sanitizer for building executables
 # (cmake 3.13 better have target_linker_options)

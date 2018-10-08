@@ -1,3 +1,7 @@
+/* utils.h - Useful program utility macros
+ *
+ * Macros for debugging and basic program usage
+ */
 #ifndef UTILS_H_INCLUDED
 #define UTILS_H_INCLUDED
 
@@ -6,84 +10,49 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define ARRAY_SIZE(arr)                                \
-            sizeof(arr) / sizeof((arr)[0])
+/* Convenience Macros */
+#define ARRAY_SIZE(arr) sizeof(arr) / sizeof((arr)[0])
+#define ABS(x) ((x) < 0 ? ((-x)) : (x))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
+#define PI 3.14159265359
+#define DEGREES(rad) ((rad) * 180.0 / PI)
+#define RADIANS(deg) ((deg) * PI / 180.0)
 
+/* Disable attributes if the compiler doesn't support them */
 #if defined(NOATTRIBUTES)
-# define __attribute__()
-#endif
+# define ATTR(...)
+#else
+# define ATTR(...) __attribute__(__VA_ARGS__)
+#endif /* NOATTRIBUTES */
 
+/* Logging + Error-checking macros */
 #if defined(NDEBUG)
 
-# define $glcheck(call) call
-# define $log(...)     (void)0
-# define $fatal(...)   (void)0
-# define $assert(X, Y) (void)sizeof(X) /* Prevents unused warnings */
+# define LOG(...)     (void)0
+# define FATAL(...)   exit(EXIT_FAILURE)
+# define ASSERT(X, Y) (void)sizeof(X) /* Prevents unused warnings */
 
 #else /* NDEBUG */
 
 /* Disable calling SDL_Quit() when debugging */
 # define SDL_Quit() (void)0
 
-# define $log(...) do {                                \
+# define LOG(...) do {                                 \
     fprintf(stderr, "%s[%u]: \n", __FILE__, __LINE__); \
     fprintf(stderr, __VA_ARGS__);                      \
     fprintf(stderr, "\n");                             \
 } while (0)
 
-# define $fatal(...) do {                              \
-    $log(__VA_ARGS__);                                 \
+# define FATAL(...) do {                               \
+    LOG(__VA_ARGS__);                                  \
     exit(EXIT_FAILURE);                                \
 } while (0)
 
-# define $assert(X, MSG) do {                          \
+# define ASSERT(X, MSG) do {                           \
     if (!(X))                                          \
-        $fatal("%s", MSG);                             \
+        FATAL("%s", MSG);                              \
 } while (0)
-
-
-# define $glcheck(call) do {                           \
-    call;                                              \
-    GLenum gl_err;                                     \
-    bool gl_had_error = false;                         \
-    while ((gl_err = glGetError()) != GL_NO_ERROR) {   \
-        $log("%s\nGL error 0x%x: %s",                  \
-            #call, gl_err, glEnumName(gl_err));        \
-        gl_had_error = true;                           \
-    }                                                  \
-    if (gl_had_error)                                  \
-        exit(EXIT_FAILURE);                            \
-} while (0)
-
-__attribute__((returns_nonnull, const))
-static inline const char *glEnumName(GLenum e)
-{
-    switch(e)
-    {
-        case GL_TEXTURE:
-            return "GL_TEXTURE";
-        case GL_RENDERBUFFER:
-            return "GL_RENDERBUFFER";
-        case GL_INVALID_ENUM:
-            return "GL_INVALID_ENUM";
-        case GL_INVALID_FRAMEBUFFER_OPERATION:
-            return "GL_INVALID_FRAMEBUFFER_OPERATION";
-        case GL_INVALID_VALUE:
-            return "GL_INVALID_VALUE";
-        case GL_INVALID_OPERATION:
-            return "GL_INVALID_OPERATION";
-        case GL_OUT_OF_MEMORY:
-            return "GL_OUT_OF_MEMORY";
-        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-            return "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
-        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-            return "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
-        case GL_FRAMEBUFFER_UNSUPPORTED:
-            return "GL_FRAMEBUFFER_UNSUPPORTED";
-        default:
-            return "(unknown)";
-    }
-}
 
 #endif /* NDEBUG */
 
