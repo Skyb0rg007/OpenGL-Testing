@@ -17,6 +17,10 @@
 # define container_of(ptr, type, member) __extension__({ \
         const __typeof__( ((type *)0)->member ) *__mptr = (ptr); \
         (type *)( (char *)__mptr - offsetof(type, member) );})
+#if 0
+# define container_of(ptr, type, member) \
+    ((type *)(char *)(ptr) - offsetof(type, member))
+#endif
 #endif /* container_of */
 
 #include <stddef.h>
@@ -214,21 +218,25 @@ static inline void hlist_move_list(struct HList *old,
  * @param tmp a HListNode * to use as safety variable
  * @param head the HList * to iterate over
  */
-#define hlist_for_each_safe(pos, tmp, head) \
+/* #define hlist_for_each_safe(pos, tmp, head) \
     for (pos = (head)->first; \
             pos && __extension__({ tmp = pos->next; 1; }); \
-            pos = tmp)
+            pos = tmp) */
+#define hlist_for_each_safe(pos, tmp, head) \
+    for (pos = (head)->first; pos && (tmp = pos->next, 1); pos = tmp)
 
 /** Get the structure for the given entry, or NULL if \p ptr is NULL
  * @param ptr a pointer to the HList member
  * @param type the type of the structure you're looking for
  * @param member the name of the member that \p ptr is
  */
-#define hlist_entry_safe(ptr, type, member)                \
+/* #define hlist_entry_safe(ptr, type, member)                \
     __extension__({                                        \
         __typeof__(ptr) ___ptr = (ptr);                    \
         ___ptr ? hlist_entry(___ptr, type, member) : NULL; \
-    })
+    }) */
+#define hlist_entry_safe(ptr, type, member) \
+    (ptr ? hlist_entry(ptr, type, member) : NULL)
 
 /** Iterate over an HList of a given type
  * @param pos the type * to use as loop variable
@@ -263,9 +271,13 @@ static inline void hlist_move_list(struct HList *old,
  * @param head the head for your list.
  * @param member the name of the HListNode within the struct.
  */
+/* #define hlist_for_each_entry_safe(pos, tmp, head, member)                 \
+    for (pos = hlist_entry_safe((head)->first, __typeof__(*pos), member); \
+         pos && __extension__({ tmp = pos->member.next; 1; });            \
+         pos = hlist_entry_safe(tmp, __typeof__(*pos), member)) */
 #define hlist_for_each_entry_safe(pos, tmp, head, member)                 \
-	for (pos = hlist_entry_safe((head)->first, __typeof__(*pos), member); \
-	     pos && __extension__({ tmp = pos->member.next; 1; });            \
-	     pos = hlist_entry_safe(tmp, __typeof__(*pos), member))
+    for (pos = hlist_entry_safe((head)->first, __typeof__(*pos), member); \
+         pos && (tmp = pos->member.next, 1);            \
+         pos = hlist_entry_safe(tmp, __typeof__(*pos), member))
 
 #endif

@@ -20,6 +20,10 @@
 # define container_of(ptr, type, member) __extension__({ \
         const __typeof__( ((type *)0)->member ) *__mptr = (ptr); \
         (type *)( (char *)__mptr - offsetof(type, member) );})
+#if 0
+# define container_of(ptr, type, member) \
+    ((type *)(char *)(ptr) - offsetof(type, member))
+#endif
 #endif /* container_of */
 
 struct List {
@@ -340,13 +344,15 @@ static inline void list_splice_tail_init(struct List *list,
  * @param type the type of the list element
  * @param member the name of the List within the struct
  */
-#define list_first_entry_or_null(ptr, type, member) __extension__ ({ \
+/* #define list_first_entry_or_null(ptr, type, member) __extension__ ({ \
         struct List *head__ = (ptr); \
-        struct List *pos__ = READ_ONCE(head__->next); \
+        struct List *pos__ = head__->next; \
         pos__ != head__ ? \
         list_entry(pos__, type, member) \
         : NULL; \
-        })
+        }) */
+#define list_first_entry_or_null(ptr, type, member) \
+    ((ptr) != (ptr)->next ? list_entry((ptr)->next, type, member) : NULL)
 
 /** Get next element in list 
  * @param pos the current list entry
