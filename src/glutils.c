@@ -30,7 +30,8 @@ GLuint gen_buffer(GLenum type, GLsizei size, const void *data)
     return buffer;
 }
 
-void attrib_buffer(GLuint idx, GLint size, GLenum type, GLsizei stride, intptr_t offset)
+void attrib_buffer(GLuint idx, GLint size, GLenum type, 
+        GLsizei stride, intptr_t offset)
 {
     static_assert(sizeof (intptr_t) == sizeof (GLvoid *), 
             "sizeof(intptr_t) != sizeof(GLvoid *)\n"

@@ -24,9 +24,12 @@ find_package(SQLite3 REQUIRED)
 # (cmake 3.13 better have target_linker_options)
 string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG 
     " -fno-omit-frame-pointer -fsanitize=address ")
+string(APPEND CMAKE_C_FLAGS_DEBUG
+    " -fno-omit-frame-pointer -fsanitize=address ")
 
 # Compile supplementary libraries
-add_subdirectory(libs/algebra)
+# add_subdirectory(libs/algebra)
+add_subdirectory(libs/structures)
 
 # Location for shaders and other resources
 set(RESOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/")

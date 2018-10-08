@@ -4,7 +4,6 @@
 #include <SDL.h>
 #include <GL/glew.h>
 
-#include "shader.h"
 #include "utils.h"
 #include "glutils.h"
 

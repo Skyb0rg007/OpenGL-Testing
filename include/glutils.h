@@ -11,19 +11,22 @@
 #include "utils.h"
 #include "glutils.h"
 
-/* OpenGL utility functions */
+/* Generating buffers (Array buffers + Element array buffers) */
 GLuint gen_buffer(GLenum type, GLsizei size, const void *data) ATTR((nonnull(3)));
 void   attrib_buffer(GLuint index, GLint size, GLenum type, 
         GLsizei stride, intptr_t offset);
 void   del_buffer(GLuint buffer);
 
+/* Generating vertex array objects */
 GLuint gen_array(void);
 void   bind_array(GLuint vao);
 void   del_array(GLuint vao);
 
+/* Generating shaders */
 GLuint make_shader(GLenum type, const char *src)  ATTR((nonnull(2)));
 GLuint load_shader(GLenum type, const char *path) ATTR((nonnull(2))); 
 
+/* Generating shader programs */
 GLuint make_program(GLuint shader1, GLuint shader2);
 GLuint load_program(const char *vpath, const char *fpath) ATTR((nonnull(1,2)));
 void   use_program(GLuint prog); 

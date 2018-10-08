@@ -19,10 +19,15 @@ target_compile_features(main
 target_compile_options(main
     PRIVATE
         -Wall -Wextra -pedantic -Wimplicit-fallthrough
-        $<$<CONFIG:Debug>: -fno-omit-frame-pointer -fsanitize=address -g3>
 )
 target_compile_definitions(main 
     PRIVATE
         "RESOURCE_DIR=\"${RESOURCE_DIR}\""
         $<$<CONFIG:Release>:"NDEBUG">
 )
+if (DISABLE_ATTRIBUTES)
+    target_compile_definitions(main
+        PRIVATE
+            "NOATTRIBUTES"
+)
+endif()

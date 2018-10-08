@@ -28,3 +28,13 @@ target_compile_features(logtest
     PRIVATE
         c_std_11
 )
+
+add_executable(structtest EXCLUDE_FROM_ALL structtest.c)
+target_link_libraries(structtest
+    PRIVATE
+        structures
+)
+target_compile_options(structtest
+    PRIVATE
+        -Wall -Wextra -pedantic
+)

@@ -21,9 +21,9 @@
 
 /* Disable attributes if the compiler doesn't support them */
 #if defined(NOATTRIBUTES)
-# define ATTR(...)
+# define ATTR(X)
 #else
-# define ATTR(...) __attribute__(__VA_ARGS__)
+# define ATTR(X) __attribute__(X)
 #endif /* NOATTRIBUTES */
 
 /* Logging + Error-checking macros */
