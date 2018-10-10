@@ -32,6 +32,11 @@ GLuint load_program(const char *vpath, const char *fpath) ATTR((nonnull(1,2)));
 void   use_program(GLuint prog); 
 void   del_program(GLuint prog);
 
+/* Generating textures */
+GLuint load_texture(const char *path);
+void   bind_texture(GLuint tex);
+void   del_texture(GLuint tex);
+
 #if defined(NDEBUG)
 # define GLCHECK(call) call
 #else

@@ -5,6 +5,9 @@
 #ifndef HLIST_H_INCLUDED
 #define HLIST_H_INCLUDED
 
+#include <stddef.h>
+#include <stdbool.h>
+
 #ifndef ATTR
 # if defined(NOATTRIBUTES)
 #  define ATTR(X)
@@ -23,9 +26,6 @@
 #endif
 #endif /* container_of */
 
-#include <stddef.h>
-#include <stdbool.h>
-
 struct HList {
     struct HListNode *first;
 };
@@ -43,19 +43,22 @@ struct HListNode {
     struct HList name = { .first = NULL }
 
 /** Initialize an HList pointer
- * @param ptr the HList to initialize
+ * @param h the HList to initialize
  */
-#define INIT_HLIST_PTR(ptr) \
-    ((ptr)->first = NULL)
+ATTR((nonnull(1)))
+static inline void INIT_HLIST_PTR(struct HList *h)
+{
+    h->first = NULL;
+}
 
 /** Initialize an HListNode pointer
  * @param h the HListNode initialize
  */
 ATTR((nonnull(1)))
-static inline void INIT_HLIST_NODE_PTR(struct HListNode *h)
+static inline void INIT_HLIST_NODE_PTR(struct HListNode *n)
 {
-    h->next = NULL;
-    h->pprev = NULL;
+    n->next = NULL;
+    n->pprev = NULL;
 }
 
 /** Determine if the HListNode is hashed

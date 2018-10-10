@@ -16,6 +16,7 @@
 #endif
 
 #define HASHTABLE(name, bits) \
+    _Pragma("GCC warning \"Use DECLARE_HASHTABLE + hash_init instead\"") \
     struct HList name[1 << (bits)] = \
         { [0 ... ((1 << (bits)) - 1)] = HLIST_INIT }
 
@@ -51,14 +52,6 @@ static inline void __hash_init(struct HList *h, unsigned int size)
  */
 #define hash_add(hashtable, node, key) \
     hlist_add_head(node, &hashtable[hash_min(key, HASH_BITS(hashtable))])
-
-/** Add an object with a string key to a hashtable
- * @param hashtable hashtable to add to
- * @param node the HListNode of the object to be added
- * @param key a null-terminated string to use as a key
- */
-#define hash_add_str(hashtable, node, key) \
-    hash_add(hashtable, node, hash_fnv(key))
 
 /** Determine if an object is in any hashtable
  * @param node the HListNode of the object to be checked

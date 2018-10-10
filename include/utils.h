@@ -10,6 +10,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+/* General helper functions */
+char *load_file(const char *path);
+int my_getline(char **lineptr, size_t *n, FILE *stream);
+float tofloat(const char *str);
+unsigned touint(const char *str);
+
 /* Convenience Macros */
 #define ARRAY_SIZE(arr) sizeof(arr) / sizeof((arr)[0])
 #define ABS(x) ((x) < 0 ? ((-x)) : (x))
@@ -28,10 +34,11 @@
 
 /* Logging + Error-checking macros */
 #if defined(NDEBUG)
-
-# define LOG(...)     (void)0
-# define FATAL(...)   exit(EXIT_FAILURE)
-# define ASSERT(X, Y) (void)sizeof(X) /* Prevents unused warnings */
+/* NOTE: sizeof is used to prevent 'unused variable' warnings */
+# define LOG(...)        (void)sizeof ((__VA_ARGS__))
+# define FATAL(...)      exit(EXIT_FAILURE)
+# define ASSERT(X, Y)    (void)sizeof (X)
+# define DEBUG_SECTION(...)
 
 #else /* NDEBUG */
 
@@ -53,6 +60,8 @@
     if (!(X))                                          \
         FATAL("%s", MSG);                              \
 } while (0)
+
+# define DEBUG_SECTION(...) { __VA_ARGS__ }
 
 #endif /* NDEBUG */
 

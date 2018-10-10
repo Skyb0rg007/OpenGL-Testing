@@ -11,5 +11,5 @@ target_include_directories(structures
 )
 target_compile_features(structures
     INTERFACE
-        c_std_11
+        c_std_99
 )

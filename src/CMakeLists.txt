@@ -1,12 +1,19 @@
 add_executable(main 
     main.c 
+    utils.c
     glutils.c
+    cube.c
+    entity.c
+    objloader.c
 )
 target_link_libraries(main 
     PRIVATE 
         OpenGL::OpenGL 
         GLEW::GLEW 
         SDL2::SDL2main
+        SDL2::SDL2_image
+        cglm
+        structures
 )
 target_include_directories(main 
     PRIVATE 
@@ -30,4 +37,4 @@ if (DISABLE_ATTRIBUTES)
         PRIVATE
             "NOATTRIBUTES"
 )
-endif()
+endif(DISABLE_ATTRIBUTES)

@@ -2,24 +2,10 @@
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
+#include <SDL.h>
+#include <SDL_image.h>
 #include "utils.h"
 #include "glutils.h"
-
-static GLchar *load_file(const char *path)
-{
-    FILE *file = fopen(path, "rb");
-    if (file == NULL) {
-        FATAL("Could not open %s: %s", path, strerror(errno));
-    }
-
-    fseek(file, 0, SEEK_END);
-    int file_length = ftell(file);
-    rewind(file);
-    char *data = calloc(file_length + 1, sizeof (char));
-    fread(data, sizeof (char), file_length, file);
-    fclose(file);
-    return data;
-}
 
 GLuint gen_buffer(GLenum type, GLsizei size, const void *data)
 {
@@ -135,6 +121,40 @@ void use_program(GLuint prog)
 void del_program(GLuint prog)
 {
     GLCHECK(glDeleteProgram(prog));
+}
+
+GLuint load_texture(const char *path)
+{
+    SDL_Surface *surface = IMG_Load(path);
+    GLuint tex;
+    GLCHECK(glGenTextures(1, &tex));
+    bind_texture(tex);
+
+    GLCHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    GLCHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    GLCHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+    GLCHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+
+    GLint mode = GL_RGB;
+    if (surface->format->BytesPerPixel == 4)
+        mode = GL_RGBA;
+
+    GLCHECK(glTexImage2D(GL_TEXTURE_2D, 0, mode, surface->w, surface->h, 0, 
+                mode, GL_UNSIGNED_BYTE, surface->pixels));
+
+    SDL_FreeSurface(surface);
+    bind_texture(0);
+    return tex;
+}
+
+void bind_texture(GLuint tex)
+{
+    GLCHECK(glBindTexture(GL_TEXTURE_2D, tex));
+}
+
+void del_texture(GLuint tex)
+{
+    GLCHECK(glDeleteTextures(1, &tex));
 }
 
 #ifndef NDEBUG
