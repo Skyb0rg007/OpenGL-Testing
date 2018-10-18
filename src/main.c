@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -12,13 +13,12 @@
 #include "objloader.h"
 
 static const GLint WIDTH = 800, HEIGHT = 600;
+static const Uint32 SDL_FLAGS = SDL_INIT_VIDEO;
+static const int    IMG_FLAGS = IMG_INIT_PNG;
 
-static SDL_Window *init_sdl(SDL_GLContext *context)
-    ATTR((returns_nonnull, nonnull(1)));
-static void cleanup_sdl(SDL_Window *window, SDL_GLContext context)
-    ATTR((nonnull(1, 2)));
-static void handle_inputs(struct Entity *cube)
-    ATTR((nonnull(1)));
+static void init_sdl(SDL_Window **w, SDL_GLContext *ctx)           ATTR((nonnull(1,2)));
+static void cleanup_sdl(SDL_Window *window, SDL_GLContext context) ATTR((nonnull(1, 2)));
+static void handle_inputs(struct Entity *cube)                     ATTR((nonnull(1)));
 static int log_cube(void *arg);
 
 int main(int argc, char *argv[])
@@ -27,7 +27,8 @@ int main(int argc, char *argv[])
 
     /* Init SDL and OpenGL */
     SDL_GLContext context;
-    SDL_Window *window = init_sdl(&context);
+    SDL_Window *window;
+    init_sdl(&window, &context);
 
     /* Set the OpenGL viewport to the entire window */
     GLCHECK(glViewport(0, 0, WIDTH, HEIGHT));
@@ -35,41 +36,34 @@ int main(int argc, char *argv[])
     /* Enable depth testing */
     GLCHECK(glEnable(GL_DEPTH_TEST));
 
-    /* Initialize Entities */
-    init_cube();
-
+    /* Limit swap interval */
     int ret = SDL_GL_SetSwapInterval(1);
     ASSERT(ret == 0, SDL_GetError());
 
-    struct ModelData stallmodeldata = {
-        .vert_filepath = RESOURCE_DIR "cube.vertex.glsl",
-        .frag_filepath = RESOURCE_DIR "cube.fragment.glsl",
-        .tex_filepath  = RESOURCE_DIR "stallTexture.png"
-    };
-    load_obj(RESOURCE_DIR "stall.obj", &stallmodeldata);
-    struct Model stallmodel;
-    create_model(&stallmodeldata, &stallmodel);
-    free_obj_modeldata(&stallmodeldata);
+    /* Create object models */
+    struct Model dragonmodel;
+    load_obj_model(RESOURCE_DIR "dragon.obj",
+                   NULL,
+                   RESOURCE_DIR "entity.vertex.glsl",
+                   RESOURCE_DIR "entity.fragment.glsl",
+                   &dragonmodel);
+
+    struct Entity dragons[10];
+
+restart:
+    srand(time(NULL));
+    for (size_t i = 0; i < ARRAY_SIZE(dragons); i++) {
+        dragons[i].x     =  (rand() % 18) - 9;
+        dragons[i].y     =  (rand() % 18) - 9;
+        dragons[i].z     = -(rand() % 20) - 5;
+        dragons[i].rot_x = (rand() % 3) - 1;
+        dragons[i].rot_y = (rand() % 3) - 1;
+        dragons[i].rot_z = (rand() % 3) - 1;
+        dragons[i].scale =  0.3f;
+    }
 
     /* Event Loop */
     SDL_Event e;
-    struct Entity cube = {
-        .x = 0.0f, .y = 0.0f, .z = -5.0f,
-        .rot_x = 0.0f, .rot_y = 0.0f, .rot_z = 0.0f,
-        .scale = 1.0f
-    };
-    struct Entity cube2 = {
-        .x = 1.0f, .y = 1.0f, .z = -5.0f,
-        .rot_x = 0.0f, .rot_y = 0.0f, .rot_z = 0.0f,
-        .scale = 1.0f
-    };
-    struct Entity stall = {
-        .x = 0.0f, .y = 0.0f, .z = -12.0f,
-        .rot_x = 0.0f, .rot_y = 0.0f, .rot_z = 0.0f,
-        .scale = 1.0f
-    };
-    int active_cube = 0;
-    /* SDL_CreateThread(log_cube, "logcube()", &cube); */
     while (1)
     {
         while (SDL_PollEvent(&e)) {
@@ -77,53 +71,47 @@ int main(int argc, char *argv[])
                     || (e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_q)) {
                 goto cleanup;
             }
-            if (e.type == SDL_KEYUP && e.key.keysym.sym == SDLK_SPACE) {
-                active_cube = (active_cube + 1) % 3;
+            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE) {
+                goto restart;
             }
         }
 
         SDL_PumpEvents();
-        if (active_cube == 0)
-            handle_inputs(&cube);
-        else if (active_cube == 1)
-            handle_inputs(&cube2);
-        else if (active_cube == 2)
-            handle_inputs(&stall);
 
         GLCHECK(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
         GLCHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-        render_cube(&cube);
-        render_cube(&cube2);
-        render_entity(&stallmodel, &stall);
+        for (size_t i = 0; i < ARRAY_SIZE(dragons); i++)
+            render_entity(&dragonmodel, &dragons[i]);
 
         SDL_GL_SwapWindow(window);
     }
 
 cleanup:
-    destroy_model(&stallmodel);
-    cleanup_cube();
+    destroy_model(&dragonmodel);
     cleanup_sdl(window, context);
 
     return EXIT_SUCCESS;
 }
 
-static SDL_Window *init_sdl(SDL_GLContext *context)
+static void init_sdl(SDL_Window **window, SDL_GLContext *context)
 {
     /* Initialize SDL2 for handling video */
-    int ret = SDL_Init(SDL_INIT_VIDEO);
+    int ret = SDL_Init(SDL_FLAGS);
     ASSERT(ret == 0, SDL_GetError());
+
     /* Configure SDL2 to work with OpenGL 3.3 */
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG|SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
     /* Create an SDL window & OpenGL context */
-    SDL_Window *window = SDL_CreateWindow("OpenGL Tutorial", 
+    *window = SDL_CreateWindow("OpenGL Tutorial", 
             0, 0, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
-    ASSERT(window != NULL, SDL_GetError());
-    *context = SDL_GL_CreateContext(window);
+    ASSERT(*window != NULL, SDL_GetError());
+    *context = SDL_GL_CreateContext(*window);
     ASSERT(*context != NULL, SDL_GetError());
 
     /* Initialize GLEW, which sets up OpenGL */
@@ -132,11 +120,8 @@ static SDL_Window *init_sdl(SDL_GLContext *context)
     ASSERT(err == GLEW_OK, glewGetErrorString(err));
 
     /* Initialize SDL_image for loading PNGs */
-    const int flags = IMG_INIT_PNG;
-    ret = IMG_Init(flags);
-    ASSERT((ret & flags) == flags, IMG_GetError());
-
-    return window;
+    ret = IMG_Init(IMG_FLAGS);
+    ASSERT((ret & IMG_FLAGS) == IMG_FLAGS, IMG_GetError());
 }
 
 static void cleanup_sdl(SDL_Window *window, SDL_GLContext context)
@@ -147,6 +132,7 @@ static void cleanup_sdl(SDL_Window *window, SDL_GLContext context)
     SDL_Quit();
 }
 
+ATTR((unused))
 static void handle_inputs(struct Entity *cube)
 {
     static const Uint8 *keyboardStates = NULL;

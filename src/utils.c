@@ -6,6 +6,14 @@
 #include <limits.h>
 #include "utils.h"
 
+/* load_file - convert a filepath into a content string
+ * @path: the filepath
+ *
+ * Contracts:
+ *  - @path is non-null and a valid file path
+ * Responsibilities:
+ *  - Call free() on the returned string
+ */
 char *load_file(const char *path)
 {
     FILE *file = fopen(path, "rb");
@@ -22,7 +30,22 @@ char *load_file(const char *path)
     return data;
 }
 
-
+/* my_getline - get the next line from @stream, returning -1 on EOF/error
+ * @lineptr: where to load the next line
+ * @n: where to store the length of the string
+ * @stream: file to read from
+ *
+ * Contracts:
+ *  - file has lines of max 256 characters
+ *  - all parameters are non-null
+ *  - the first call to my_getline() sets *lineptr = NULL and *n = 0
+ *  - the file does not have NULL bytes
+ *  - Not threadsafe - uses static memory
+ * Responsibilities:
+ *  - Call free() on *@lineptr after the last my_getline() call for a file
+ *
+ *  TODO: make work for arbitrary length + fallback to GNU getline
+ */
 int my_getline(char **lineptr, size_t *n, FILE *stream)
 {
     static char line[256];
@@ -30,18 +53,15 @@ int my_getline(char **lineptr, size_t *n, FILE *stream)
     unsigned int len;
 
     if (lineptr == NULL || n == NULL)
-    {
-        errno = EINVAL;
         return -1;
-    }
 
-    if (ferror (stream))
+    if (ferror(stream))
         return -1;
 
     if (feof(stream))
         return -1;
 
-    fgets(line,256,stream);
+    fgets(line, sizeof line, stream);
 
     ptr = strchr(line,'\n');   
     if (ptr)
@@ -53,7 +73,7 @@ int my_getline(char **lineptr, size_t *n, FILE *stream)
     {
         ptr = realloc(*lineptr, 256);
         if (ptr == NULL)
-            return(-1);
+            return -1;
         *lineptr = ptr;
         *n = 256;
     }

@@ -13,7 +13,7 @@ target_link_libraries(main
         SDL2::SDL2main
         SDL2::SDL2_image
         cglm
-        structures
+        klib
 )
 target_include_directories(main 
     PRIVATE 
@@ -21,11 +21,16 @@ target_include_directories(main
 )
 target_compile_features(main
     PRIVATE
-        c_std_11
+        c_std_99
+        c_static_assert
 )
 target_compile_options(main
     PRIVATE
-        -Wall -Wextra -pedantic -Wimplicit-fallthrough
+        -Wall -Wextra -pedantic
+        -Wlogical-op -Wrestrict -Wnull-dereference
+        -Winline -Wvla
+        -Wjump-misses-init -Wno-double-promotion
+        -Wshadow -Wformat=2
 )
 target_compile_definitions(main 
     PRIVATE

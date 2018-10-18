@@ -19,6 +19,9 @@ struct UIntVector {
 #define VEC_INIT(varname, sz) \
 { .size = sz, .count = 0, .data = calloc(sz, sizeof (*(varname).data)) }
 
+#define VEC_FREE(varname) \
+    free((varname).data)
+
 #define CHECK_SIZE(vec, padding) \
     if ((vec).count + (padding) > (vec).size) { \
         (vec).size *= 2; \

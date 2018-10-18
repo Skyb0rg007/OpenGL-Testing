@@ -18,7 +18,11 @@ struct Model {
            vbo_normals,
            ebo_indices,
            texture;
-    GLint matrix_uniform;
+    GLint model_uniform,
+          view_uniform,
+          projection_uniform,
+          light_pos_uniform,
+          light_color_uniform;
     GLsizei num_indices;
 };
 

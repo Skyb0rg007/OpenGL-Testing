@@ -126,6 +126,8 @@ void del_program(GLuint prog)
 GLuint load_texture(const char *path)
 {
     SDL_Surface *surface = IMG_Load(path);
+    ASSERT(surface != NULL, IMG_GetError());
+
     GLuint tex;
     GLCHECK(glGenTextures(1, &tex));
     bind_texture(tex);

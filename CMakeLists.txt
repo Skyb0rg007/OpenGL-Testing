@@ -10,6 +10,7 @@ if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "In-source builds are not allowed")
 endif()
 
+# Add custom Find*.cmake files to the search path
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 # Load all the needed packages
@@ -23,20 +24,22 @@ find_package(SQLite3 REQUIRED) # FindSQLite3.cmake
 option(DISABLE_ATTRIBUTES "Removes __attribute__ syntax" OFF)
 
 # Enable Address Sanitizer for building executables
-# (cmake 3.13 better have target_linker_options)
 string(APPEND CMAKE_EXE_LINKER_FLAGS_DEBUG 
     " -fno-omit-frame-pointer -fsanitize=address ")
 string(APPEND CMAKE_C_FLAGS_DEBUG
     " -fno-omit-frame-pointer -fsanitize=address ")
 
-# "Compile" supplementary libraries
-add_subdirectory(libs/structures)
+# supplementary libraries
+# add_subdirectory(libs/structures)
 add_subdirectory(libs/cglm)
+add_subdirectory(libs/klib)
 
 # Location for shaders and other resources
 set(RESOURCE_DIR "${CMAKE_SOURCE_DIR}/resources/")
 
+# the main executable
 add_subdirectory(src)
 
+# the testing suite
 # enable_testing()
 add_subdirectory(tests)
