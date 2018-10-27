@@ -5,19 +5,18 @@
 #ifndef UTILS_H_INCLUDED
 #define UTILS_H_INCLUDED
 
-#include <GL/glew.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
 
 /* General helper functions */
 char *load_file(const char *path);
-int my_getline(char **lineptr, size_t *n, FILE *stream);
+long my_getline(char **lineptr, size_t *n, FILE *stream);
+long my_getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 float tofloat(const char *str);
 unsigned touint(const char *str);
 
 /* Convenience Macros */
-#define ARRAY_SIZE(arr) sizeof(arr) / sizeof((arr)[0])
+#define ARRAY_SIZE(arr) sizeof (arr) / sizeof ((arr)[0])
 #define ABS(x) ((x) < 0 ? ((-x)) : (x))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -37,8 +36,7 @@ unsigned touint(const char *str);
 /* NOTE: sizeof is used to prevent 'unused variable' warnings */
 # define LOG(...)        (void)sizeof ((__VA_ARGS__))
 # define FATAL(...)      exit(EXIT_FAILURE)
-# define ASSERT(X, Y)    (void)sizeof (X)
-# define DEBUG_SECTION(...)
+# define ASSERT(X, ...)  (void)sizeof (X)
 
 #else /* NDEBUG */
 
@@ -52,16 +50,15 @@ unsigned touint(const char *str);
 } while (0)
 
 # define FATAL(...) do {                               \
+    /* TODO: This doesn't work on MVSC */              \
     LOG(__VA_ARGS__);                                  \
     exit(EXIT_FAILURE);                                \
 } while (0)
 
-# define ASSERT(X, MSG) do {                           \
+# define ASSERT(X, ...) do {                           \
     if (!(X))                                          \
-        FATAL("%s", MSG);                              \
+        FATAL(__VA_ARGS__);                            \
 } while (0)
-
-# define DEBUG_SECTION(...) { __VA_ARGS__ }
 
 #endif /* NDEBUG */
 

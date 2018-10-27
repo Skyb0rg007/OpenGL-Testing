@@ -26,11 +26,23 @@ target_compile_features(main
 )
 target_compile_options(main
     PRIVATE
-        -Wall -Wextra -pedantic
-        -Wlogical-op -Wrestrict -Wnull-dereference
-        -Winline -Wvla
-        -Wjump-misses-init -Wno-double-promotion
-        -Wshadow -Wformat=2
+        $<$<OR:$<C_COMPILER_ID:GNU>,$<C_COMPILER_ID:Clang>>:
+            -Wall -Wextra -pedantic
+            -Wformat=2 -Wwrite-strings -Wstrict-overflow=5
+            -Winline -Wnested-externs 
+            -Wno-double-promotion
+            -Wshadow -Wformat=2
+            -fno-common -Wfloat-equal 
+        >
+        $<$<C_COMPILER_ID:GNU>:
+            -Wlogical-op -Wstrict-aliasing=2
+            -Wjump-misses-init -Wcast-align=strict 
+        >
+        $<$<C_COMPILER_ID:Clang>:
+            -Wcast-align 
+        >
+        # if I hate myself
+        # -Wconversion
 )
 target_compile_definitions(main 
     PRIVATE

@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
     /* Limit swap interval */
     int ret = SDL_GL_SetSwapInterval(1);
-    ASSERT(ret == 0, SDL_GetError());
+    ASSERT(ret == 0, "SDL_GL_SetSwapInterval: %s", SDL_GetError());
 
     /* Create object models */
     struct Model dragonmodel;
@@ -98,7 +98,7 @@ static void init_sdl(SDL_Window **window, SDL_GLContext *context)
 {
     /* Initialize SDL2 for handling video */
     int ret = SDL_Init(SDL_FLAGS);
-    ASSERT(ret == 0, SDL_GetError());
+    ASSERT(ret == 0, "SDL_Init: %s", SDL_GetError());
 
     /* Configure SDL2 to work with OpenGL 3.3 */
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -110,18 +110,18 @@ static void init_sdl(SDL_Window **window, SDL_GLContext *context)
     /* Create an SDL window & OpenGL context */
     *window = SDL_CreateWindow("OpenGL Tutorial", 
             0, 0, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
-    ASSERT(*window != NULL, SDL_GetError());
+    ASSERT(*window != NULL, "SDL_CreateWindow: %s", SDL_GetError());
     *context = SDL_GL_CreateContext(*window);
     ASSERT(*context != NULL, SDL_GetError());
 
     /* Initialize GLEW, which sets up OpenGL */
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
-    ASSERT(err == GLEW_OK, glewGetErrorString(err));
+    ASSERT(err == GLEW_OK, "glewInit: %s", glewGetErrorString(err));
 
     /* Initialize SDL_image for loading PNGs */
     ret = IMG_Init(IMG_FLAGS);
-    ASSERT((ret & IMG_FLAGS) == IMG_FLAGS, IMG_GetError());
+    ASSERT((ret & IMG_FLAGS) == IMG_FLAGS, "IMG_Init: %s", IMG_GetError());
 }
 
 static void cleanup_sdl(SDL_Window *window, SDL_GLContext context)

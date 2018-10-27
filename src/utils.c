@@ -21,65 +21,78 @@ char *load_file(const char *path)
         FATAL("Could not open %s: %s", path, strerror(errno));
     }
 
-    fseek(file, 0, SEEK_END);
+    int ret = fseek(file, 0, SEEK_END);
+    ASSERT(ret != -1, "fseek: %s", strerror(errno));
     int file_length = ftell(file);
+    ASSERT(file_length != -1, "ftell: %s", strerror(errno));
     rewind(file);
     char *data = calloc(file_length + 1, sizeof (char));
-    fread(data, sizeof (char), file_length, file);
-    fclose(file);
+    ASSERT(data != NULL, "Out of memory");
+    ret = fread(data, sizeof (char), file_length, file);
+    ASSERT(ret == file_length, "fread");
+    ret = fclose(file);
+    ASSERT(ret != EOF, "fclose: %s", strerror(errno));
     return data;
 }
 
-/* my_getline - get the next line from @stream, returning -1 on EOF/error
- * @lineptr: where to load the next line
- * @n: where to store the length of the string
- * @stream: file to read from
+/* my_getline() - reads a line from @stream into @lineptr
+ * @lineptr: where to place the pointer to the buffer
+ * @n: where to place the size of the buffer
+ * @stream: the FILE to read from
  *
- * Contracts:
- *  - file has lines of max 256 characters
- *  - all parameters are non-null
- *  - the first call to my_getline() sets *lineptr = NULL and *n = 0
- *  - the file does not have NULL bytes
- *  - Not threadsafe - uses static memory
- * Responsibilities:
- *  - Call free() on *@lineptr after the last my_getline() call for a file
+ * Returns: the number of characters read, not including '\0'
  *
- *  TODO: make work for arbitrary length + fallback to GNU getline
+ * Set *lineptr to NULL and *n to 0 before calling my_getline for the first time
+ * Call free(*lineptr) for the last call to my_getline
  */
-int my_getline(char **lineptr, size_t *n, FILE *stream)
+long my_getline(char **lineptr, size_t *n, FILE *stream)
 {
-    static char line[256];
-    char *ptr;
-    unsigned int len;
+    return my_getdelim(lineptr, n, '\n', stream);
+}
 
-    if (lineptr == NULL || n == NULL)
-        return -1;
+long my_getdelim(char **lineptr, size_t *n, int delim, FILE *stream)
+{
+    /* The first call to the function */
+	if (*lineptr == NULL || *n == 0) {
+		*n = BUFSIZ;
+		if ((*lineptr = malloc(*n)) == NULL)
+			return -1;
+	}
 
-    if (ferror(stream))
-        return -1;
+	char *ptr = *lineptr, 
+         *eptr = *lineptr + *n;
 
-    if (feof(stream))
-        return -1;
+	for (;;) {
+		int c = fgetc(stream);
 
-    fgets(line, sizeof line, stream);
+		if (c == EOF) {
+			if (feof(stream)) {
+				long diff = ptr - *lineptr;
+				if (diff != 0) {
+					*ptr = '\0';
+					return diff;
+				}
+			}
+			return -1;
+		}
 
-    ptr = strchr(line,'\n');   
-    if (ptr)
-        *ptr = '\0';
-
-    len = strlen(line);
-
-    if ((len+1) < 256)
-    {
-        ptr = realloc(*lineptr, 256);
-        if (ptr == NULL)
-            return -1;
-        *lineptr = ptr;
-        *n = 256;
-    }
-
-    strcpy(*lineptr,line); 
-    return len;
+		*ptr++ = c;
+		if (c == delim) {
+			*ptr = '\0';
+			return ptr - *lineptr;
+		}
+		if (ptr + 2 >= eptr) {
+			char *nbuf;
+			size_t nbufsiz = *n * 2;
+			long d = ptr - *lineptr;
+			if ((nbuf = realloc(*lineptr, nbufsiz)) == NULL)
+				return -1;
+			*lineptr = nbuf;
+			*n = nbufsiz;
+			eptr = nbuf + nbufsiz;
+			ptr = nbuf + d;
+		}
+	}
 }
 
 float tofloat(const char *str)

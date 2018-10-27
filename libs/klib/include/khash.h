@@ -576,6 +576,14 @@ static kh_inline khint_t __ac_Wang_hash(khint_t key)
 		code;												\
 	} }
 
+/* kh_foreach_bkt - Iterate over the buckets in the hash table
+ * @h:   Pointer to the hash table [khash_t(name)*]
+ * @bkt: Iterator [kh_iter_t]
+ */
+#define kh_foreach_bkt(h, bkt) \
+    for ((bkt) = kh_begin(h); (bkt) != kh_end(h); (bkt)++) \
+        if (kh_exist(h, bkt))
+
 /* More conenient interfaces */
 
 /*! @function

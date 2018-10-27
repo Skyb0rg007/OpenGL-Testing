@@ -8,7 +8,6 @@
 #include "glutils.h"
 #include "objloader.h"
 #include "utils.h"
-#include "entity.h"
 
 #define MAX_LINE_LEN 256
 
@@ -27,15 +26,12 @@
  */
 void load_obj(const char *filepath, struct ModelData *out)
 {
-    kvec_t(GLfloat) vertices;
-    kvec_t(GLfloat) normals;
-    kvec_t(GLfloat) texture_uv;
-    kv_init(vertices);
-    kv_init(normals);
-    kv_init(texture_uv);
+    kvec_t(GLfloat) vertices   = KVEC_INIT;
+    kvec_t(GLfloat) normals    = KVEC_INIT;
+    kvec_t(GLfloat) texture_uv = KVEC_INIT;
 
     FILE *file = fopen(filepath, "rt");
-    ASSERT(file != NULL, strerror(errno));
+    ASSERT(file != NULL, "fopen: %s", strerror(errno));
 
     char line[MAX_LINE_LEN];
 
@@ -61,9 +57,7 @@ void load_obj(const char *filepath, struct ModelData *out)
     }
 
     /* Get ready to read the object's indices */
-    kvec_t(unsigned) indices;
-    kv_init(indices);
-    /* struct UIntVector indices = VEC_INIT(indices, 64); */
+    kvec_t(unsigned) indices = KVEC_INIT;
 
     /* Allocate output array for normals and texture_uv */
     float *normals_out    = calloc(kv_size(vertices), sizeof (GLfloat));
@@ -76,8 +70,8 @@ void load_obj(const char *filepath, struct ModelData *out)
                 unsigned vertexPointer = touint(strtok(NULL, "/")) - 1;
                 *kv_pushp(unsigned, indices) = vertexPointer;
                 unsigned texturePointer = touint(strtok(NULL, "/")) - 1;
-                texture_uv_out[vertexPointer*2] = kv_A(texture_uv,texturePointer*2);
-                texture_uv_out[vertexPointer*2+1] = 1 - kv_A(texture_uv,texturePointer*2+1);
+                texture_uv_out[vertexPointer*2] = kv_A(texture_uv, texturePointer*2);
+                texture_uv_out[vertexPointer*2+1] = 1 - kv_A(texture_uv, texturePointer*2+1);
                 unsigned normPointer = touint(strtok(NULL, " ")) - 1;
                 normals_out[vertexPointer*3]   = kv_A(normals, normPointer*3);
                 normals_out[vertexPointer*3+1] = kv_A(normals, normPointer*3+1);
@@ -131,7 +125,7 @@ void free_obj_modeldata(struct ModelData *m)
  * Responsibilities:
  *  - Call destroy_model() on the Model structure after use
  */
-void load_obj_model(const char *objfile, const char *texturefile, 
+/* void load_obj_model(const char *objfile, const char *texturefile, 
         const char *vertexfile, const char *fragmentfile, struct Model *m)
 {
     struct ModelData data = {
@@ -142,4 +136,4 @@ void load_obj_model(const char *objfile, const char *texturefile,
     load_obj(objfile, &data);
     create_model(&data, m);
     free_obj_modeldata(&data);
-}
+} */

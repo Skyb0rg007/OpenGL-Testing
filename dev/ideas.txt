@@ -1,0 +1,44 @@
+src|include
+	utils.c - utilities
+	glutils.c - OpenGL utilities
+	objloader.c - Loading .obj files
+	ECS
+		world.c - World structure : state.c, components.c
+		state.c - WorldState structure
+		components.c - all component structures
+	render
+		static.c - rendering static entities : world.c
+		render_system.c - rendering system : render/*
+	physics
+		physics_system.c - physics system : physics/*
+	main.c - the main loop
+
+enum RenderType {
+	RENDER_STATIC,
+	RENDER_TERRAIN,
+};
+
+struct Renderable {
+	GLuint VAO;
+	GLuint program;
+	GLsizei num_indices;
+	
+	enum RenderType type;
+	union {
+		struct StaticShader {
+			GLuint transformation_matrix;
+			GLuint projection_matrix;
+			GLuint view_matrix;
+			GLuint light_position;
+			...
+		} static_shader;
+		
+		struct TerrainShader {
+			GLuint transformation_matrix;
+			GLuint projection_matrix;
+			GLuint view_matrix;
+			GLuint light_position;
+			...
+		} terrain_shader;
+	};
+};

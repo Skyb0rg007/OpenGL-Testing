@@ -3,12 +3,12 @@
 #include <sqlite3.h>
 #include <assert.h>
 
+#define eprintf(msg, ...) fprintf(stderr, msg, __VA_ARGS__);
+
 int main(int argc, char *argv[])
 {
     (void)argc, (void)argv;
-    char *str = SDL_GetPrefPath("org.name", "test-app");
-    printf("PrefPath = %s\n", str);
-    SDL_free(str);
+    eprintf("%s", "example\n");
 
     return 0;
 }
