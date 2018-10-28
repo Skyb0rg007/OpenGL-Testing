@@ -125,13 +125,13 @@ void render_entities(const struct Model *m, const struct Entity *entity, size_t 
     for (size_t i = 0; i < n; i++) {
         /* Set up model matrix */
         mat4 model = GLM_MAT4_IDENTITY_INIT;
-        glm_translate_x(model, entity->x);
-        glm_translate_y(model, entity->y);
-        glm_translate_z(model, entity->z);
-        glm_rotate_x(model, entity->rot_x, model);
-        glm_rotate_y(model, entity->rot_y, model);
-        glm_rotate_z(model, entity->rot_z, model);
-        glm_scale_uni(model, entity->scale);
+        glm_translate_x(model, entity[i].x);
+        glm_translate_y(model, entity[i].y);
+        glm_translate_z(model, entity[i].z);
+        glm_rotate_x(model, entity[i].rot_x, model);
+        glm_rotate_y(model, entity[i].rot_y, model);
+        glm_rotate_z(model, entity[i].rot_z, model);
+        glm_scale_uni(model, entity[i].scale);
 
         GLCHECK(glUniformMatrix4fv(m->model_uniform, 1, GL_FALSE, model[0]));
         GLCHECK(glUniformMatrix4fv(m->view_uniform, 1, GL_FALSE, view[0]));

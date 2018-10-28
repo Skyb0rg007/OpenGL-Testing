@@ -77,12 +77,13 @@ restart:
         }
 
         SDL_PumpEvents();
+        for (unsigned i = 0; i < ARRAY_SIZE(dragons); i++)
+            handle_inputs(&dragons[i]);
 
         GLCHECK(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
         GLCHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-        for (size_t i = 0; i < ARRAY_SIZE(dragons); i++)
-            render_entity(&dragonmodel, &dragons[i]);
+        render_entities(&dragonmodel, dragons, ARRAY_SIZE(dragons));
 
         SDL_GL_SwapWindow(window);
     }
@@ -132,7 +133,6 @@ static void cleanup_sdl(SDL_Window *window, SDL_GLContext context)
     SDL_Quit();
 }
 
-ATTR((unused))
 static void handle_inputs(struct Entity *cube)
 {
     static const Uint8 *keyboardStates = NULL;
